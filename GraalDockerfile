@@ -1,0 +1,23 @@
+FROM bigtruedata/sbt as build-env
+
+WORKDIR /
+
+COPY . /
+
+RUN sbt assembly
+
+FROM oracle/graalvm-ce as graal
+
+RUN gu install native-image
+
+COPY --from=build-env /target/scala-2.12/hello-world-assembly-1.0.jar /run.jar
+
+RUN native-image -jar run.jar -H:Name=out && echo "helloousaUaaso"
+
+FROM ubuntu
+
+WORKDIR /
+
+COPY --from=graal /out /out
+
+CMD ["./out"]

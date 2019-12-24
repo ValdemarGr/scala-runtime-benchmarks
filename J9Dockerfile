@@ -1,0 +1,13 @@
+FROM bigtruedata/sbt as build-env
+
+WORKDIR /
+
+COPY . /
+
+RUN sbt assembly
+
+FROM adoptopenjdk:11-jre-openj9
+
+COPY --from=build-env /target/scala-2.12/hello-world-assembly-1.0.jar /run.jar
+
+CMD java -jar run.jar
